@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 
 app = FastAPI(title="Python bug laboratory")
@@ -27,6 +27,5 @@ def page():
 @app.post("/api/greet")
 async def greet(request: Request):
     data = await request.json()
-    if not isinstance(data, dict) or not isinstance(data.get('name'), str) or not data['name'].strip():
-        raise HTTPException(status_code=422, detail='name is required')
+    # The demo intentionally has a runtime defect. The investigator must discover it.
     return {"message": f"Hello, {data['name']}!"}
