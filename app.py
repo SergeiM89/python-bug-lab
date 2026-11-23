@@ -1,8 +1,35 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import HTMLResponse, JSONResponse
+from pydantic import BaseModel, field_validator
 
 # Local teaching fixture: Starlette returns real unhandled tracebacks in HTTP 500 responses.
 app = FastAPI(title="Python bug laboratory", debug=True)
+
+
+class GreetRequest(BaseModel):
+    name: str
+
+    @field_validator("name")
+    @classmethod
+    def name_must_not_be_blank(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("name must not be blank")
+        return value
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(request: Request, exc: RequestValidationError):
+    if any("name" in error.get("loc", ()) for error in exc.errors()):
+        return JSONResponse(
+            status_code=422,
+            content={
+                "detail": "Запрос отклонён: поле name обязательно и должно быть непустой строкой"
+            },
+        )
+    return await request_validation_exception_handler(request, exc)
 
 
 @app.get("/health")
@@ -65,7 +92,5 @@ def page():
 
 
 @app.post("/api/greet")
-async def greet(request: Request):
-    data = await request.json()
-    # The demo intentionally has a runtime defect. The investigator must discover it.
-    return {"message": f"Hello, {data['name']}!"}
+async def greet(data: GreetRequest):
+    return {"message": f"Hello, {data.name}!"}
