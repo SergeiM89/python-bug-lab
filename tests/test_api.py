@@ -1,5 +1,5 @@
-from fastapi.testclient import TestClient
 from app import app
+from fastapi.testclient import TestClient
 
 client = TestClient(app, raise_server_exceptions=False)
 
@@ -15,4 +15,20 @@ def test_correct_name():
 
 
 def test_missing_name_is_validation_error():
-    assert client.post("/api/greet", json={}).status_code in {400, 422}
+    response = client.post("/api/greet", json={})
+    assert response.status_code == 422
+    assert response.json()["detail"]
+    assert "Traceback" not in response.text
+
+
+def test_empty_name_is_validation_error():
+    response = client.post("/api/greet", json={"name": "   "})
+    assert response.status_code == 422
+    assert response.json()["detail"]
+
+
+def test_error_diagnostics_are_visible_on_the_page():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert 'id="result-status"' in response.text
+    assert 'aria-label="Ответ и traceback backend"' in response.text
