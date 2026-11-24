@@ -19,7 +19,7 @@ def page():
     main{max-width:860px;margin:48px auto;padding:0 24px}h1{margin-bottom:8px}
     p{color:#b8c6d9}.buttons{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0}
     button{font:inherit;padding:12px 18px;border:1px solid #64d4b0;border-radius:10px;
-    background:#64d4b0;color:#10231d;cursor:pointer}button+button{background:transparent;color:#eef2ff}
+    background:#64d4b0;color:#10231d;cursor:pointer}button.failure{background:#f0808b;border-color:#f0808b;color:#321219}
     button:disabled{opacity:.55;cursor:wait}section{padding:20px;border:1px solid #34445a;border-radius:12px}
     section[data-kind="error"]{border-color:#ff7e88}section[data-kind="handled"]{border-color:#e7bf72}
     section[data-kind="success"]{border-color:#64d4b0}h2{font-size:20px;margin:0}
@@ -29,7 +29,7 @@ def page():
     </style></head><body><main><h1>Python API Lab</h1>
     <p>Отправьте запрос: ниже появятся HTTP-статус, сообщение и диагностика backend.</p>
     <div class="buttons"><button onclick='send({name:"Ada"})'>Корректный запрос</button>
-    <button onclick='send({})'>Запрос без имени</button></div>
+    <button class="failure" onclick='send({})'>Запрос без имени</button></div>
     <section id="response" hidden aria-busy="false"><h2 id="result-status" role="status" aria-live="polite"></h2>
     <p id="result-message"></p><pre id="result" tabindex="0" aria-label="Ответ и traceback backend"></pre></section>
     <script>
